@@ -14,7 +14,8 @@ becomes an exported material without a recorded click sequence.
 4. Export the material and score it with EditScore/MaskScore.
 
 ## Install
-Copy this directory into the user plugin directory
-(`~/Documents/Adobe/Adobe Substance 3D Sampler/python/plugins/`) and restart the
-application. `MASKSCORE_IMAGE` naming a photograph runs a batch on load; with the
-variable unset the plugin stays idle.
+Copy `MaterialSamplerMaskScore/` into the user plugin directory
+(`~/Documents/Allegorithmic/Adobe Substance 3D Sampler/plugins/`) and restart the
+application. The loader expects the folder and its `.py`, `.qml` and `.svg` to share
+one name. `MASKSCORE_IMAGE` naming a photograph runs a batch on load; with the
+variable unset the plugin registers its panel and stays idle.

@@ -1,5 +1,7 @@
 import os
 
+from PySide6 import QtCore, QtQml, QtQuick
+
 import substance_sampler
 
 IMAGE_ENV = "MASKSCORE_IMAGE"
@@ -36,12 +38,25 @@ def run_batch(image_path, project_path=None, export_dir=None):
     return written
 
 
+class MaterialSamplerMaskScore(QtQuick.QQuickItem):
+    def __init__(self, parent=None):
+        super(MaterialSamplerMaskScore, self).__init__(parent)
+
+    @QtCore.Slot(str)
+    def build_material(self, image_path):
+        print("material-sampler-maskscore wrote %s" % run_batch(image_path))
+
+
 def _start():
+    QtQml.qmlRegisterType(
+        MaterialSamplerMaskScore, "MaterialSamplerMaskScore", 1, 0,
+        "MaterialSamplerMaskScore",
+    )
     image = os.environ.get(IMAGE_ENV)
-    if not image:
+    if image:
+        print("material-sampler-maskscore wrote %s" % run_batch(image))
+    else:
         print("material-sampler-maskscore idle: set %s to run a batch" % IMAGE_ENV)
-        return
-    print("material-sampler-maskscore wrote %s" % run_batch(image))
 
 
 substance_sampler.run_in_main_thread(_start)
