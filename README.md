@@ -17,5 +17,10 @@ becomes an exported material without a recorded click sequence.
 Copy `MaterialSamplerMaskScore/` into the user plugin directory
 (`~/Documents/Allegorithmic/Adobe Substance 3D Sampler/plugins/`) and restart the
 application. The loader expects the folder and its `.py`, `.qml` and `.svg` to share
-one name. `MASKSCORE_IMAGE` naming a photograph runs a batch on load; with the
-variable unset the plugin registers its panel and stays idle.
+one name. `maskscore.json` beside the module names the photograph and the export directory.
+
+## The batch does not run at load
+The plugin registers its panel and stops there. At plugin-load time the workflow
+assets are not loaded, so `create_project` fails with `Could not create workflow
+asset PBR Metallic / Roughness` and `create_asset` returns `None`. Run the batch
+from the panel button once the application is up.

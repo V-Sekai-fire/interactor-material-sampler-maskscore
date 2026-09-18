@@ -1,12 +1,20 @@
+import json
 import os
 
 from PySide6 import QtCore, QtQml, QtQuick
 
 import substance_sampler
 
-IMAGE_ENV = "MASKSCORE_IMAGE"
-EXPORT_ENV = "MASKSCORE_EXPORT_DIR"
+BATCH_CONFIG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "maskscore.json")
 DEFAULT_EXPORT_DIR = os.path.join(os.path.expanduser("~"), "maskscore", "materials")
+
+
+def batch_config(path=BATCH_CONFIG):
+    """Read the batch to run. Absent file means idle, which is how the tool opens by hand."""
+    if not os.path.exists(path):
+        return {}
+    with open(path) as handle:
+        return json.load(handle)
 
 
 def material_from_image(image_path, name=None):
@@ -19,7 +27,7 @@ def material_from_image(image_path, name=None):
 
 
 def export_material(asset, export_dir=None):
-    export_dir = export_dir or os.environ.get(EXPORT_ENV, DEFAULT_EXPORT_DIR)
+    export_dir = export_dir or DEFAULT_EXPORT_DIR
     os.makedirs(export_dir, exist_ok=True)
     controller = asset.export_material(export_dir)
     controller.wait()
@@ -44,7 +52,13 @@ class MaterialSamplerMaskScore(QtQuick.QQuickItem):
 
     @QtCore.Slot(str)
     def build_material(self, image_path):
-        print("material-sampler-maskscore wrote %s" % run_batch(image_path))
+        config = batch_config()
+        written = run_batch(
+            image_path or config.get("image"),
+            config.get("project_path"),
+            config.get("export_dir"),
+        )
+        print("material-sampler-maskscore wrote %s" % written)
 
 
 def _start():
@@ -52,11 +66,9 @@ def _start():
         MaterialSamplerMaskScore, "MaterialSamplerMaskScore", 1, 0,
         "MaterialSamplerMaskScore",
     )
-    image = os.environ.get(IMAGE_ENV)
-    if image:
-        print("material-sampler-maskscore wrote %s" % run_batch(image))
-    else:
-        print("material-sampler-maskscore idle: set %s to run a batch" % IMAGE_ENV)
+    # The batch does not run here: at plugin-load time the workflow assets are
+    # not loaded yet, so create_project fails and create_asset returns None.
+    print("material-sampler-maskscore ready: run the batch from the panel")
 
 
 substance_sampler.run_in_main_thread(_start)
