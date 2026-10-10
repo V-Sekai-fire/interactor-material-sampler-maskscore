@@ -12,4 +12,4 @@ Copy `MaterialSamplerMaskScore/` into the application's user plugin directory an
 
 ## Licence
 
-The licence is not stated.
+MIT. See [LICENSE](LICENSE).
